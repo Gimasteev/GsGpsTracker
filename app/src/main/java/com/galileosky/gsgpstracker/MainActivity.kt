@@ -3,8 +3,6 @@ package com.galileosky.gsgpstracker
 import android.os.Bundle
 
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.galileosky.gsgpstracker.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

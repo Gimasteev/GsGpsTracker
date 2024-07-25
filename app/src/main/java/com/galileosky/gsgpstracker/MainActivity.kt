@@ -1,10 +1,13 @@
 package com.galileosky.gsgpstracker
 
 import android.os.Bundle
-import android.widget.Toast
 
 import androidx.appcompat.app.AppCompatActivity
 import com.galileosky.gsgpstracker.databinding.ActivityMainBinding
+import com.galileosky.gsgpstracker.fragments.MainFragment
+import com.galileosky.gsgpstracker.fragments.SettingsFragment
+import com.galileosky.gsgpstracker.fragments.TracksFragment
+import com.galileosky.gsgpstracker.utils.openFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -12,15 +15,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        onButtonNavClicks()
+        onButtonNavClicks() // слушатель нажатий
+        openFragment(MainFragment.newInstance())
+
     }
 
     private fun onButtonNavClicks() {
         binding.bNav.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.id_home -> Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show()
-                R.id.id_tracks -> Toast.makeText(this, "Tracks", Toast.LENGTH_SHORT).show()
-                R.id.id_settings -> Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show()
+                // убираем тосты и меняем на смену фрагментов через кнопки
+                R.id.id_home -> openFragment(MainFragment.newInstance())
+                R.id.id_tracks -> openFragment(TracksFragment.newInstance())
+                R.id.id_settings -> openFragment(SettingsFragment.newInstance())
             }
             true
         }

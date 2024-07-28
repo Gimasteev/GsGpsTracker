@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.galileosky.gsgpstracker.databinding.ActivityMainBinding
 import com.galileosky.gsgpstracker.fragments.MainFragment
-import com.galileosky.gsgpstracker.fragments.SettingsFragment
+import com.galileosky.gsgpstracker.fragments.SettinsFragment
 import com.galileosky.gsgpstracker.fragments.TracksFragment
 import com.galileosky.gsgpstracker.utils.openFragment
 
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
                 // убираем тосты и меняем на смену фрагментов через кнопки
                 R.id.id_home -> openFragment(MainFragment.newInstance())
                 R.id.id_tracks -> openFragment(TracksFragment.newInstance())
-                R.id.id_settings -> openFragment(SettingsFragment.newInstance())
+                R.id.id_settings -> openFragment(SettinsFragment())
             }
             true
         }

@@ -3,4 +3,7 @@
     <string name="home">Начало</string>
     <string name="tracks">Треки</string>
     <string name="settings">Настройки</string>
+    <string name="update_time">Время обновления</string>
+    <string name="update_time_summary">Время обновления местоположения</string>
+    <string name="location">Местоположение</string>
 </resources>

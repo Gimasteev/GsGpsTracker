@@ -11,6 +11,7 @@
             android:key="update_time_key"
             android:title="@string/update_time"
             app:icon="@drawable/ic_baseline_timelapse_24"
-            app:iconSpaceReserved="true" />
+            app:iconSpaceReserved="true"
+            app:summary="@string/update_time_summary" />
     </PreferenceCategory>
 </PreferenceScreen>

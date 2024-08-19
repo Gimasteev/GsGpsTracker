@@ -3,14 +3,28 @@
 <resources>
     <string-array name="loc_time_update_name">
 <!--        создаем элементы для выбора времени обновления координат в settings -->
-        <item>3 cec</item>
-        <item>5 cec</item>
-        <item>10 cec</item>
+        <item>3 sec</item>
+        <item>5 sec</item>
+        <item>10 sec</item>
     </string-array>
     <string-array name="loc_time_update_value">
 <!--реальное время обновления координат -->
         <item>3000</item>
         <item>5000</item>
         <item>10000</item>
+    </string-array>
+<!--    название цвета для настроек-->
+    <string-array name="track_color_name">
+        <!--        создаем элементы для выбора времени обновления координат в settings -->
+        <item>@string/Blue</item>
+        <item>@string/Pink</item>
+        <item>@string/Green</item>
+    </string-array>
+<!--    коды цветов для настроек цвета трека-->
+    <string-array name="track_color_value">
+        <!--реальное время обновления координат -->
+        <item>#3e33bf</item>
+        <item>#c22184</item>
+        <item>#5eb635</item>
     </string-array>
 </resources>

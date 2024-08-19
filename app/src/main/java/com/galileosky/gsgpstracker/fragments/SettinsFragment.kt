@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.galileosky.gsgpstracker.R
-import com.galileosky.gsgpstracker.utils.showToast
 
 // унаследуемся от PreferenceFragmentCompat
 class SettinsFragment: PreferenceFragmentCompat() {
@@ -22,7 +21,7 @@ class SettinsFragment: PreferenceFragmentCompat() {
         timePref = findPreference("update_time_key")!!
         val changeListener = onChangeListener()
         timePref.onPreferenceChangeListener = changeListener
-
+        initPref()
     }
     // общая функция происходящих изменений. Возвращает элемент pref, в котором произошли изменения и само измененное значение в value
     private fun onChangeListener(): Preference.OnPreferenceChangeListener{
@@ -37,5 +36,14 @@ class SettinsFragment: PreferenceFragmentCompat() {
             // showToast("Изменено на $value")
             true
         }
+    }
+
+    private fun initPref() {
+        val pref = timePref.preferenceManager.sharedPreferences
+        val nameArray = resources.getStringArray(R.array.loc_time_update_name)
+        val valueArray = resources.getStringArray(R.array.loc_time_update_value)
+        val title = timePref.title
+        val pos = valueArray.indexOf(pref?.getString("update_time_key","3000"))
+        timePref.title = "$title: ${nameArray[pos]}"
     }
 }

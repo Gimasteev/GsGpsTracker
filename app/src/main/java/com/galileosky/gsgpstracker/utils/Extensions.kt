@@ -15,6 +15,10 @@ fun Fragment.openFragment(f:Fragment) {
 
 // создаю функцию для активити
 fun AppCompatActivity.openFragment(f:Fragment) {
+    // Пример получения имени фрагмента в logcat
+    //Log.d("MyLog","Fragment name ${f.javaClass}")
+    if (supportFragmentManager.fragments.isNotEmpty()) // условие для того, чтобы не открывалось одно и то же активити
+        if (supportFragmentManager.fragments[0].javaClass == f.javaClass) return // если в списке фрагментов есть уже фрагмент, то мы его не заменяем
     supportFragmentManager
         .beginTransaction()
         .setCustomAnimations(android.R.anim.fade_in,android.R.anim.fade_out) // добавим анимацию

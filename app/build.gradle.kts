@@ -48,4 +48,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.androidx.preference.ktx)
+    implementation(libs.osmdroid.android)
+    implementation(libs.osmbonuspack)
 }

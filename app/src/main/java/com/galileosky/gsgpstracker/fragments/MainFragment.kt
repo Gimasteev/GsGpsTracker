@@ -1,10 +1,10 @@
 package com.galileosky.gsgpstracker.fragments
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.galileosky.gsgpstracker.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
@@ -18,6 +18,7 @@ class MainFragment : Fragment() {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
     }
+
 
     companion object {
         @JvmStatic

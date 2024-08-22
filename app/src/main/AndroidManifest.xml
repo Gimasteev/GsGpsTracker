@@ -2,8 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
+<!--    разрешение на получение точного местоположения-->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<!--    разрешение на получение примерного местоположения-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+<!--    разрешение на получение координат в фоновом режиме-->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
     <application
         android:allowBackup="true"

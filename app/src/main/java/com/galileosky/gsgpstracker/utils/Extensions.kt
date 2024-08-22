@@ -1,7 +1,9 @@
 package com.galileosky.gsgpstracker.utils
 
+import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.galileosky.gsgpstracker.R
 
@@ -33,4 +35,12 @@ fun Fragment.showToast(s: String) {
 // функции для тостов в активити
 fun AppCompatActivity.showToast(s: String) {
     Toast.makeText(this,s, Toast.LENGTH_SHORT).show()
+}
+
+// Функция запроса разрешения
+fun Fragment.checkPermission(p: String): Boolean{
+    return when(PackageManager.PERMISSION_GRANTED){ //PERMISSION_GRANTED == 0 это значит что разрешение получено
+        ContextCompat.checkSelfPermission(activity as AppCompatActivity, p) -> true
+        else -> false
+    }
 }

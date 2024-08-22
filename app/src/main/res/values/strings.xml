@@ -8,6 +8,7 @@
     <string name="update_time_summary">Location update time</string>
     <string name="track_color">Track color</string>
     <string name="track_color_summary">Select track color</string>
+    <string name="no_permisson_Fine_Location">No permission to obtain a location</string>
 <!--    для цветов-->
     <string name="Pink">Pink</string>
     <string name="Green">Pink</string>

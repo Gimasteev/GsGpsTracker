@@ -79,17 +79,90 @@ class MainFragment : Fragment() {
                 }
         }
     }
-
-    // для разных версий андроид требуется различные разрешения. Для андроид 10 и ранее одно разрешение, а для старше 10 - 2
-    private fun checkLocPermission(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-            checkPermissonAfter10()
+    // основная проверка разрешений
+    private fun checkLocPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Build.VERSION.SDK_INT проверяет версию разрешения и если она выше A11(R),то используем функцию...
+            checkPermissionForRAndAbove()
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+            // иначе если версия Q то используем функцию...
+            checkPermissionForQ()
         } else {
-            checkPermissonBefore10()
+            // иначе просто все что ниже 10ой версии, то...
+            checkPermissionBeforeQ()
         }
     }
 
-    // проверяем разрешения при версии 10 и выше
+    // Для Android 11 (R) и выше
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun checkPermissionForRAndAbove() {
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            if (checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                initOSM()
+            } else {
+                // Объясни пользователю, зачем нужно разрешение на фоновое местоположение, затем запрашивай его
+                showBackgroundLocationPermissionRationale()
+            }
+        } else {
+            pLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
+        }
+    }
+
+    // Для Android 10 (Q)
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun checkPermissionForQ() {
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
+            checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+            initOSM()
+        } else {
+            pLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+            )
+        }
+    }
+
+    // Для Android 9 и ниже
+    private fun checkPermissionBeforeQ() {
+        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            initOSM()
+        } else {
+            pLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
+        }
+    }
+
+    // Показываем диалог или уведомление с объяснением
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun showBackgroundLocationPermissionRationale() {
+        // Показать диалог или экран с объяснением
+        // Затем запустить pLauncher для запроса разрешения на фоновое местоположение
+        pLauncher.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+    }
+
+
+
+
+
+    companion object {
+        @JvmStatic
+        fun newInstance() = MainFragment()
+    }
+}
+
+/* OLD VERSION
+
+// для разных версий андроид требуется различные разрешения. Для андроид 10 и ранее одно разрешение, а для старше 10 - 2
+private fun checkLocPermission(){
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
+        checkPermissonAfter10()
+    } else {
+        checkPermissonBefore10()
+    }
+}
+
+// проверяем разрешения при версии 10 и выше
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun checkPermissonAfter10() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -121,8 +194,4 @@ class MainFragment : Fragment() {
     }
 
 
-    companion object {
-        @JvmStatic
-        fun newInstance() = MainFragment()
-    }
-}
+ */

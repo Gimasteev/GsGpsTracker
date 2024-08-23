@@ -39,7 +39,8 @@ fun AppCompatActivity.showToast(s: String) {
 
 // Функция запроса разрешения
 fun Fragment.checkPermission(p: String): Boolean{
-    return when(PackageManager.PERMISSION_GRANTED){ //PERMISSION_GRANTED == 0 это значит что разрешение получено
+    return when(PackageManager.PERMISSION_GRANTED)
+    { //PERMISSION_GRANTED == 0 это значит что разрешение получено
         ContextCompat.checkSelfPermission(activity as AppCompatActivity, p) -> true
         else -> false
     }

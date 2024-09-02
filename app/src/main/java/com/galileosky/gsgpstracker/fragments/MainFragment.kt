@@ -44,6 +44,11 @@ class MainFragment : Fragment() {
         checkLocPermission()
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkLocPermission()
+    }
+
     private fun settingsOsm() {
         Configuration.getInstance().load(
             requireActivity(),

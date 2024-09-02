@@ -16,4 +16,6 @@
     <string name="location_dialog_message">Хотите включить GPS?</string>
     <string name="button_positive">Да</string>
     <string name="button_negative">Нет</string>
+    <string name="start_stop_button">Остановка и запись трека</string>
+    <string name="locating">Определение местоположения</string>
 </resources>

@@ -18,4 +18,7 @@
     <string name="location_dialog_message">Do you want enable GPS?</string>
     <string name="button_positive">Yes</string>
     <string name="button_negative">No</string>
+    <!--    для кнопок описание-->
+    <string name="start_stop_button">Stopping and recording a track</string>
+    <string name="locating">Locating</string>
 </resources>

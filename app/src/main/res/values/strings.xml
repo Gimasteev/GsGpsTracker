@@ -13,4 +13,9 @@
     <string name="Pink">Pink</string>
     <string name="Green">Pink</string>
     <string name="Blue">Pink</string>
+<!--    для диалогового окна-->
+    <string name="location_disabled">Location disabled</string>
+    <string name="location_dialog_message">Do you want enable GPS?</string>
+    <string name="button_positive">Yes</string>
+    <string name="button_negative">No</string>
 </resources>

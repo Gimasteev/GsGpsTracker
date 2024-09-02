@@ -12,4 +12,8 @@
     <string name="Pink">Розовый</string>
     <string name="Green">Зеленый</string>
     <string name="Blue">Синий</string>
+    <string name="location_disabled">Местонахождение отключено</string>
+    <string name="location_dialog_message">Хотите включить GPS?</string>
+    <string name="button_positive">Да</string>
+    <string name="button_negative">Нет</string>
 </resources>

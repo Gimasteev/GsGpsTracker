@@ -11,8 +11,10 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.galileosky.gsgpstracker.databinding.FragmentMainBinding
+import com.galileosky.gsgpstracker.utils.DialogManager
 import com.galileosky.gsgpstracker.utils.checkPermission
 import com.galileosky.gsgpstracker.utils.showToast
 import org.osmdroid.config.Configuration
@@ -73,9 +75,8 @@ class MainFragment : Fragment() {
         pLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()){
                 if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true){ // приравниваем к true, чтобы исключить null
-                    if (checkLocationEnabled())
+                    checkLocationEnabled()
                         initOSM()
-
                 } else {
                     showToast("Вы не дали разрешения на использование местоположения")
                 }
@@ -100,10 +101,8 @@ class MainFragment : Fragment() {
     private fun checkPermissionForRAndAbove() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-                if (checkLocationEnabled())
+                checkLocationEnabled()
                     initOSM()
-
-
             } else {
                 // Объясни пользователю, зачем нужно разрешение на фоновое местоположение, затем запрашивай его
                 showBackgroundLocationPermissionRationale()
@@ -118,7 +117,7 @@ class MainFragment : Fragment() {
     private fun checkPermissionForQ() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
             checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-            if(checkLocationEnabled())
+            checkLocationEnabled()
                 initOSM()
 
         } else {
@@ -134,21 +133,21 @@ class MainFragment : Fragment() {
     // Для Android 9 и ниже
     private fun checkPermissionBeforeQ() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            if(checkLocationEnabled())
-                initOSM()
+            checkLocationEnabled()
+            initOSM()
 
         } else {
             pLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
         }
     }
 
-    private fun checkLocationEnabled(): Boolean {
+    private fun checkLocationEnabled(){
         val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
         if (!isEnabled){
-            showToast("GPS выключен, пожалуйста, включите его")
-        }
-        return isEnabled
+            DialogManager.showLocEnableDialog(activity as AppCompatActivity)
+        } else {
+            showToast("Location enabled") }
     }
 
     // Показываем диалог или уведомление с объяснением

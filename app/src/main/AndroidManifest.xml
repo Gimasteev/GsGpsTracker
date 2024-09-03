@@ -8,6 +8,10 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 <!--    разрешение на получение координат в фоновом режиме-->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <!--    разрешение на работу сервиса в фоновом режиме-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+
 
     <application
         android:allowBackup="true"
@@ -28,6 +32,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!--    декларируем сервис-->
+        <!--    обозначаем что сервис получения координат для того, чтобы Android не закрыл данный сервис-->
+
+            <service
+            android:name=".location.LocationService"
+            android:foregroundServiceType="location"
+            android:enabled="true" />
+
+
     </application>
 
 </manifest>

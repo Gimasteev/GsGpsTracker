@@ -21,4 +21,7 @@
     <!--    для кнопок описание-->
     <string name="start_stop_button">Stopping and recording a track</string>
     <string name="locating">Locating</string>
+    <!--    для нотификации-->
+    <string name="tracker_running">Tracker is running!</string>
+    <string name="background_running">Your application is running in the background</string>
 </resources>

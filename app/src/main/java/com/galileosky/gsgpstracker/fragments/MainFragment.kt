@@ -16,6 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.galileosky.gsgpstracker.databinding.FragmentMainBinding
+import com.galileosky.gsgpstracker.location.LocationService
 import com.galileosky.gsgpstracker.utils.DialogManager
 import com.galileosky.gsgpstracker.utils.checkPermission
 import com.galileosky.gsgpstracker.utils.showToast
@@ -41,7 +42,13 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         registerPermissions()
-        checkLocPermission()
+
+        // запускаем сервис в зависимости от версии
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            activity?.startForegroundService(Intent(activity, LocationService::class.java))
+        } else {
+            activity?.startService(Intent(activity, LocationService::class.java))
+        }
     }
 
     override fun onResume() {

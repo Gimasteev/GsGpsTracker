@@ -12,27 +12,34 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.galileosky.gsgpstracker.MainActivity
 import com.galileosky.gsgpstracker.R
-
+// создаем сервис для работы в трее
 class LocationService : Service() {
+    // обязательный метод для всех сервисов, он используется для связывания с компонентами, которые запускают этот сервис.
     override fun onBind(intent: Intent?): IBinder? {
+        // возвращаем null т.к. он не связан с компонентами другими
         return null
     }
-
+    // вызывается, когда сервис запущен (startService)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // запускает уведомление, которое отображается в трее и уведомляет пользователя о том, что сервис работает
         startNotification()
+        // устанавливает флаг, указывающий, что сервис в данный момент активен
+        isRunning = true
+        // Возвращает START_STICKY, что означает, что сервис должен быть воссоздан системой, если он завершен принудительно (например, при недостатке ресурсов).
         return START_STICKY
     }
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("MyLog", "LS_onCreate")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("MyLog", "LS_onDestroy")
+        // указываем что сервис больше не активен
+        isRunning = false
     }
 
+    // Этот метод отвечает за создание и запуск уведомления, которое будет отображаться в статусной строке, пока сервис активен.
     private fun startNotification() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val nChannel = NotificationChannel(
@@ -56,7 +63,7 @@ class LocationService : Service() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher) // Иконка для уведомления
             .setContentTitle(getString(R.string.tracker_running)) // Основной текст
-            .setContentText("Your application is running in the background") // Описание уведомления
+            .setContentText(getString(R.string.background_running)) // Описание уведомления
             .setContentIntent(pIntent)
             .setPriority(NotificationCompat.PRIORITY_LOW) // Низкий приоритет
             .build()
@@ -67,5 +74,6 @@ class LocationService : Service() {
 
     companion object {
         const val CHANNEL_ID = "channel_1"
+        var isRunning = false
     }
 }

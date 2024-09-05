@@ -8,9 +8,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 <!--    разрешение на получение координат в фоновом режиме-->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
-    <!--    разрешение на работу сервиса в фоновом режиме-->
+    <!--    разрешения на работу сервиса в фоновом режиме-->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <!--    разрешение на работу сервиса в уведомлении-->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 
     <application

@@ -20,4 +20,5 @@
     <string name="locating">Определение местоположения</string>
     <string name="tracker_running">Трекер работает</string>
     <string name="background_running">Ваше приложение работает в фоновом режиме</string>
+    <string name="timer">Таймер</string>
 </resources>

@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.galileosky.gsgpstracker.R
 import com.galileosky.gsgpstracker.databinding.FragmentMainBinding
 import com.galileosky.gsgpstracker.location.LocationService
 import com.galileosky.gsgpstracker.utils.DialogManager
@@ -26,6 +27,8 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
 class MainFragment : Fragment() {
+    // Переменная для проверки работы сервиса
+    private var isServiceRunning = false
     private lateinit var binding: FragmentMainBinding
     // переменная для разршений, работающая с массивом строк
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
@@ -42,13 +45,55 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         registerPermissions()
+        setOnClicks()
+        checkServiceState()
+    }
 
+    private fun setOnClicks() = with(binding){
+        val listener = onClicks()
+        fStartStop.setOnClickListener(listener)
+    }
+
+    // Слушатель нажатий для любой кнопки в mainfragment
+    private fun onClicks(): View.OnClickListener{
+        return View.OnClickListener {
+            when(it.id){
+                R.id.fStartStop -> startStopService()
+            }
+        }
+    }
+
+    private fun startStopService(){
+        // если сервис не запущен, то запускаем функцию
+        if (!isServiceRunning){
+            startLocService()
+        } else {
+            activity?.stopService(Intent(activity,LocationService::class.java))
+            binding.fStartStop.setImageResource(R.drawable.ic_play)
+        }
+        // принемаем обратное значение
+        isServiceRunning = !isServiceRunning
+    }
+
+    // Проверяем состояние сервиса и если он работает,
+    // то меняем кнопку на стоп
+    private fun checkServiceState(){
+        isServiceRunning = LocationService.isRunning
+        if (isServiceRunning == true){
+            binding.fStartStop.setImageResource(R.drawable.ic_stop)
+        }
+    }
+
+
+    private fun startLocService(){
         // запускаем сервис в зависимости от версии
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             activity?.startForegroundService(Intent(activity, LocationService::class.java))
         } else {
             activity?.startService(Intent(activity, LocationService::class.java))
         }
+        // меняем значек сервиса при изменении
+        binding.fStartStop.setImageResource(R.drawable.ic_stop)
     }
 
     override fun onResume() {

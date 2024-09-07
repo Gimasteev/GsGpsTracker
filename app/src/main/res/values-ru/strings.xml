@@ -21,4 +21,9 @@
     <string name="tracker_running">Трекер работает</string>
     <string name="background_running">Ваше приложение работает в фоновом режиме</string>
     <string name="timer">Таймер</string>
+    <string name="map_distance">Дистанция</string>
+    <string name="map_meters">м</string>
+    <string name="map_speed">Скорость</string>
+    <string name="map_kmh">км/ч</string>
+    <string name="map_a_speed">Средняя скорость</string>
 </resources>

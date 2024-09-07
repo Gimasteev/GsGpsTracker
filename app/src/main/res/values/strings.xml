@@ -26,4 +26,10 @@
     <string name="background_running">Your application is running in the background</string>
     <!--    для таймера-->
     <string name="timer">Timer</string>
+    <!--    для экрана карты тексты-->
+    <string name="map_distance">Distance</string>
+    <string name="map_meters">m</string>
+    <string name="map_speed">Speed</string>
+    <string name="map_kmh">km/h</string>
+    <string name="map_a_speed">Average Speed</string>
 </resources>

@@ -1,5 +1,5 @@
 package com.galileosky.gsgpstracker.fragments
-
+import java.util.Locale
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -9,7 +9,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,8 +17,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
+import androidx.fragment.app.activityViewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.galileosky.gsgpstracker.MainViewModel
 import com.galileosky.gsgpstracker.R
 import com.galileosky.gsgpstracker.databinding.FragmentMainBinding
 import com.galileosky.gsgpstracker.location.LocationModel
@@ -38,6 +38,9 @@ import java.util.TimerTask
 class MainFragment : Fragment() {
     private lateinit var binding: FragmentMainBinding
 
+    // инициализируем ViewModel класс
+    private val model: MainViewModel by activityViewModels()
+
     // переменная для проверки работы сервиса
     private var isServiceRunning = false
 
@@ -46,9 +49,6 @@ class MainFragment : Fragment() {
 
     // переменная для хранения времени старта маршрута
     private var startTime = 0L
-
-    // переменная
-    private val timeData = MutableLiveData<String>()
 
     // переменная для разршений, работающая с массивом строк
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
@@ -69,6 +69,7 @@ class MainFragment : Fragment() {
         checkServiceState()
         updateTime()
         regisetrLocReciever() // регистрируем ресивер
+        locationUpdates()
     }
 
     private fun setOnClicks() = with(binding) {
@@ -76,6 +77,7 @@ class MainFragment : Fragment() {
         fStartStop.setOnClickListener(listener)
     }
 
+    // Слушатель нажатий для любой кнопки в mainfragment
     // Слушатель нажатий для любой кнопки в mainfragment
     private fun onClicks(): View.OnClickListener {
         return View.OnClickListener {
@@ -85,8 +87,36 @@ class MainFragment : Fragment() {
         }
     }
 
+    private fun locationUpdates() = with(binding) {
+        model.locationUpdates.observe(viewLifecycleOwner) {
+            val distance = "${getString(R.string.map_distance)}: ${String.format(Locale.getDefault(), "%.1f", it.distance)} ${getString(R.string.map_meters)}"
+            val velocity = "${getString(R.string.map_speed)}: ${String.format(Locale.getDefault(), "%.1f", 3.6f * it.velocity)} ${getString(R.string.map_kmh)}"
+            val averageVelocity = "${getString(R.string.map_a_speed)}: ${getAverageSpeed(it.distance)} ${getString(R.string.map_kmh)}"
+            tvDistance.text = distance
+            tvSpeed.text = velocity
+            tvAverageSpeed.text = averageVelocity
+        }
+    }
+    /* Старый код
+
+    private fun locationUpdates() = with(binding){
+        // функция будет запускаться когда в locationUpdates
+        // передадим новое значение
+        model.locationUpdates.observe(viewLifecycleOwner){
+            val distance = "${getString(R.string.map_distance)}: ${String.format("%.1f", it.distance)} ${getString(R.string.map_meters)}"
+            val velosity = "${getString(R.string.map_speed)}: ${String.format("%.1f", 3.6f * it.velocity)} ${getString(R.string.map_kmh)}"
+            val Avelosity = "${getString(R.string.map_a_speed)}: ${getAverageSpeed(it.distance)} ${getString(R.string.map_kmh)}"
+            tvDistance.text = distance
+            tvSpeed.text = velosity
+            tvAverageSpeed.text = Avelosity
+        }
+    }
+     */
+
+
+    // обновляем время на экране карты
     private fun updateTime() {
-        timeData.observe(viewLifecycleOwner) {
+        model.timeData.observe(viewLifecycleOwner) {
             binding.tvTime.text = it
         }
     }
@@ -99,10 +129,19 @@ class MainFragment : Fragment() {
         timer?.schedule(object : TimerTask() {
             override fun run() {
                 activity?.runOnUiThread {
-                    timeData.value = getCurrentTime()
+                    model.timeData.value = getCurrentTime()
                 }
             }
         }, 1000, 1000)
+    }
+
+    // функция получения средней скорости
+    private fun getAverageSpeed(distance: Float): String {
+        return String.format(
+            Locale.getDefault(),
+            "%.1f",
+            3.6f * (distance / ((System.currentTimeMillis() - startTime) / 1000.0f))
+        )
     }
 
     private fun getCurrentTime(): String {
@@ -281,6 +320,7 @@ class MainFragment : Fragment() {
 
 
     // забираем данные от LocationService
+    // поправил эту часть кода из за DEPRECATION getSerializableExtra
     private val receiever = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, i: Intent?) {
             // фильтр ресивера для принятия только нужных данных
@@ -292,12 +332,24 @@ class MainFragment : Fragment() {
                     i.getSerializableExtra(LocationService.LOC_MODEL_INTENT) as? LocationModel
                 }
                 locModel?.let {
-                    Log.d("MyLog", "Main Fragment Distance: ${it.distance}")
+                    model.locationUpdates.value = locModel
                 }
             }
         }
 
     }
+
+    // Старый код
+    /*
+    private val receiever = object : BroadcastReceiver() {
+    override fun onReceive(context: Context?, i: Intent?) {
+        if (i?.action == LocationService.LOC_MODEL_INTENT) {
+            val locModel = i.getSerializableExtra(LocationService.LOC_MODEL_INTENT) as LocationModel
+            model.locationUpdates.value = locModel
+        }
+    }
+}
+     */
 
     // регистрируем ресивер
     private fun regisetrLocReciever(){

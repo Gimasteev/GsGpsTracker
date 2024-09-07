@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import com.galileosky.gsgpstracker.R
 import com.galileosky.gsgpstracker.databinding.SaveDialogBinding
+import com.galileosky.gsgpstracker.db.TrackItem
 
 object DialogManager{
     fun showLocEnableDialog(context: Context, listener: Listener){
@@ -24,7 +25,7 @@ object DialogManager{
     }
 
     // логика диалога сохранения трека
-    fun showSaveDialog(context: Context, listener: Listener){
+    fun showSaveDialog(context: Context, item: TrackItem?, listener: Listener){
         // Обращаюсь к AlertDialog т.к. через него проще делать воспроизведение кастомного диалога
         val builder = AlertDialog.Builder(context)
         // собственную разметку добавляем
@@ -32,6 +33,12 @@ object DialogManager{
         builder.setView(binding.root)
         val dialog = builder.create()
         binding.apply {
+            val time = item?.time
+            val speed = "${item?.velocity} km/h"
+            val distance = "${item?.distance} m"
+            tvTime.text = time
+            tvVelocity.text = speed
+            tvDistance.text = distance
             bSave.setOnClickListener {
                 listener.onClick()
                 dialog.dismiss()

@@ -23,6 +23,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.galileosky.gsgpstracker.MainViewModel
 import com.galileosky.gsgpstracker.R
 import com.galileosky.gsgpstracker.databinding.FragmentMainBinding
+import com.galileosky.gsgpstracker.db.TrackItem
 import com.galileosky.gsgpstracker.location.LocationModel
 import com.galileosky.gsgpstracker.location.LocationService
 import com.galileosky.gsgpstracker.utils.DialogManager
@@ -41,6 +42,7 @@ import java.util.TimerTask
 class MainFragment : Fragment() {
     private lateinit var binding: FragmentMainBinding
 
+    private var trackItem: TrackItem? = null
     // переменная для отображения первого старта
     private var firstStart: Boolean = true
     // переменная для полилинии
@@ -102,6 +104,14 @@ class MainFragment : Fragment() {
             tvDistance.text = distance
             tvSpeed.text = velocity
             tvAverageSpeed.text = averageVelocity
+            trackItem = TrackItem(
+                null,
+                getCurrentTime(),
+                TimeUtils.getDate(),
+                String.format("%.1f", it.distance),
+                getAverageSpeed(it.distance),
+                ""
+            )
             updatePolyline(it.geoPointsList)
         }
     }
@@ -167,7 +177,9 @@ class MainFragment : Fragment() {
             binding.fStartStop.setImageResource(R.drawable.ic_play)
             timer?.cancel()
             // сохранение маршрута
-            DialogManager.showSaveDialog(requireContext(), object : DialogManager.Listener{
+            DialogManager.showSaveDialog(requireContext(),
+                trackItem,
+                object : DialogManager.Listener{
                 override fun onClick() {
                     showToast("Saved")
                 }

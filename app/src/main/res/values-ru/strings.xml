@@ -26,4 +26,10 @@
     <string name="map_speed">Скорость</string>
     <string name="map_kmh">км/ч</string>
     <string name="map_a_speed">Средняя скорость</string>
+    <string name="save_track">Сохранить текущий трек?</string>
+    <string name="save_time">Время</string>
+    <string name="save_speed">Скорость</string>
+    <string name="save_distance">Расстояние</string>
+    <string name="button_save">Сохранить</string>
+    <string name="button_Cancel">Отмена</string>
 </resources>

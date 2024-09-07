@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
@@ -30,6 +31,8 @@ import com.galileosky.gsgpstracker.utils.checkPermission
 import com.galileosky.gsgpstracker.utils.showToast
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.Timer
@@ -38,6 +41,10 @@ import java.util.TimerTask
 class MainFragment : Fragment() {
     private lateinit var binding: FragmentMainBinding
 
+    // переменная для отображения первого старта
+    private var firstStart: Boolean = true
+    // переменная для полилинии
+    private var pl: Polyline? = null
     // инициализируем ViewModel класс
     private val model: MainViewModel by activityViewModels()
 
@@ -95,6 +102,7 @@ class MainFragment : Fragment() {
             tvDistance.text = distance
             tvSpeed.text = velocity
             tvAverageSpeed.text = averageVelocity
+            updatePolyline(it.geoPointsList)
         }
     }
     /* Старый код
@@ -158,6 +166,12 @@ class MainFragment : Fragment() {
             activity?.stopService(Intent(activity, LocationService::class.java))
             binding.fStartStop.setImageResource(R.drawable.ic_play)
             timer?.cancel()
+            // сохранение маршрута
+            DialogManager.showSaveDialog(requireContext(), object : DialogManager.Listener{
+                override fun onClick() {
+                    showToast("Saved")
+                }
+            })
         }
         // принемаем обратное значение
         isServiceRunning = !isServiceRunning
@@ -201,6 +215,8 @@ class MainFragment : Fragment() {
     }
 
     private fun initOSM() = with(binding) {
+        pl = Polyline() // инициализируем полилинию
+        pl?.outlinePaint?.color = Color.BLUE
         map.controller.setZoom(18.0)
         // Создается экземпляр класса GpsMyLocationProvider, который используется для получения данных о местоположении устройства с помощью GPS.
         // Этот провайдер будет передавать данные о местоположении для использования на карте.
@@ -215,6 +231,7 @@ class MainFragment : Fragment() {
         myLocOverLay.runOnFirstFix {
             map.overlays.clear()
             map.overlays.add(myLocOverLay)
+            map.overlays.add(pl) // добавили слой полилинии
         }
         //map.controller.animateTo(GeoPoint(58.00171, 56.295304))
         //58.00171° 56.295304°
@@ -358,6 +375,40 @@ class MainFragment : Fragment() {
         LocalBroadcastManager.getInstance(activity as AppCompatActivity)
             .registerReceiver(receiever, locFilter)
     }
+
+    // функция добавления точек polyline
+    private fun addPoint(list: List<GeoPoint>){
+        pl?.addPoint(list[list.size - 1]) // добавляем последнюю точку
+    }
+
+    // функция заполнения точек polyline должна запуститься
+    // только один раз
+    private fun fillPolyLine(list: List<GeoPoint>){
+        list.forEach{
+            pl?.addPoint(it)
+        }
+    }
+
+    // тут уду решать что делать - или восстанавливать историю полилини
+    // или сразу строить на карте
+    private fun updatePolyline(list: List<GeoPoint>){
+        if (list.size > 1 && firstStart){
+        // тогда выгружаем точки
+            fillPolyLine(list)
+            firstStart = false
+        } else {
+            addPoint(list)
+        }
+
+
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        LocalBroadcastManager.getInstance(activity as AppCompatActivity)
+            .unregisterReceiver(receiever)
+    }
+
 
     companion object {
         @JvmStatic

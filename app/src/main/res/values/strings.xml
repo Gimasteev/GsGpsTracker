@@ -32,4 +32,11 @@
     <string name="map_speed">Speed</string>
     <string name="map_kmh">km/h</string>
     <string name="map_a_speed">Average Speed</string>
+    <!--    для экрана диалогоа-->
+    <string name="save_track">Save this track?</string>
+    <string name="save_time">Time</string>
+    <string name="save_speed">Speed</string>
+    <string name="save_distance">Distance</string>
+    <string name="button_save">Save</string>
+    <string name="button_Cancel">Cancel</string>
 </resources>

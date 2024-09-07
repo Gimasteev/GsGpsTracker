@@ -1,12 +1,15 @@
 package com.galileosky.gsgpstracker.fragments
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +19,10 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.galileosky.gsgpstracker.R
 import com.galileosky.gsgpstracker.databinding.FragmentMainBinding
+import com.galileosky.gsgpstracker.location.LocationModel
 import com.galileosky.gsgpstracker.location.LocationService
 import com.galileosky.gsgpstracker.utils.DialogManager
 import com.galileosky.gsgpstracker.utils.TimeUtils
@@ -32,14 +37,19 @@ import java.util.TimerTask
 
 class MainFragment : Fragment() {
     private lateinit var binding: FragmentMainBinding
+
     // переменная для проверки работы сервиса
     private var isServiceRunning = false
+
     // переменная для таймера
     private var timer: Timer? = null
+
     // переменная для хранения времени старта маршрута
     private var startTime = 0L
+
     // переменная
     private val timeData = MutableLiveData<String>()
+
     // переменная для разршений, работающая с массивом строк
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
 
@@ -58,34 +68,35 @@ class MainFragment : Fragment() {
         setOnClicks()
         checkServiceState()
         updateTime()
+        regisetrLocReciever() // регистрируем ресивер
     }
 
-    private fun setOnClicks() = with(binding){
+    private fun setOnClicks() = with(binding) {
         val listener = onClicks()
         fStartStop.setOnClickListener(listener)
     }
 
     // Слушатель нажатий для любой кнопки в mainfragment
-    private fun onClicks(): View.OnClickListener{
+    private fun onClicks(): View.OnClickListener {
         return View.OnClickListener {
-            when(it.id){
+            when (it.id) {
                 R.id.fStartStop -> startStopService()
             }
         }
     }
 
-    private fun updateTime(){
-        timeData.observe(viewLifecycleOwner){
+    private fun updateTime() {
+        timeData.observe(viewLifecycleOwner) {
             binding.tvTime.text = it
         }
     }
 
     // функция для таймера
-    private fun startTimer(){
+    private fun startTimer() {
         timer?.cancel()
         timer = Timer()
         startTime = LocationService.startTime
-        timer?.schedule(object: TimerTask(){
+        timer?.schedule(object : TimerTask() {
             override fun run() {
                 activity?.runOnUiThread {
                     timeData.value = getCurrentTime()
@@ -94,19 +105,18 @@ class MainFragment : Fragment() {
         }, 1000, 1000)
     }
 
-    private fun getCurrentTime(): String{
+    private fun getCurrentTime(): String {
         // добавил код чтобы отображалось слово Таймер/Timer
         return "${getString(R.string.timer)}: ${TimeUtils.getTime(System.currentTimeMillis() - startTime)}"
     }
 
 
-
-    private fun startStopService(){
+    private fun startStopService() {
         // если сервис не запущен, то запускаем функцию
-        if (!isServiceRunning){
+        if (!isServiceRunning) {
             startLocService()
         } else {
-            activity?.stopService(Intent(activity,LocationService::class.java))
+            activity?.stopService(Intent(activity, LocationService::class.java))
             binding.fStartStop.setImageResource(R.drawable.ic_play)
             timer?.cancel()
         }
@@ -116,16 +126,16 @@ class MainFragment : Fragment() {
 
     // Проверяем состояние сервиса и если он работает,
     // то меняем кнопку на стоп
-    private fun checkServiceState(){
+    private fun checkServiceState() {
         isServiceRunning = LocationService.isRunning
-        if (isServiceRunning == true){
+        if (isServiceRunning == true) {
             binding.fStartStop.setImageResource(R.drawable.ic_stop)
             startTimer()
         }
     }
 
 
-    private fun startLocService(){
+    private fun startLocService() {
         // запускаем сервис в зависимости от версии
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             activity?.startForegroundService(Intent(activity, LocationService::class.java))
@@ -151,7 +161,7 @@ class MainFragment : Fragment() {
         Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
     }
 
-    private fun initOSM() = with(binding){
+    private fun initOSM() = with(binding) {
         map.controller.setZoom(18.0)
         // Создается экземпляр класса GpsMyLocationProvider, который используется для получения данных о местоположении устройства с помощью GPS.
         // Этот провайдер будет передавать данные о местоположении для использования на карте.
@@ -172,17 +182,19 @@ class MainFragment : Fragment() {
     }
 
     // запуск лаунчера для окна разрешения
-    private fun registerPermissions(){
+    private fun registerPermissions() {
         pLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()){
-                if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true){ // приравниваем к true, чтобы исключить null
-                    checkLocationEnabled()
-                        initOSM()
-                } else {
-                    showToast("Вы не дали разрешения на использование местоположения")
-                }
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
+            if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true) { // приравниваем к true, чтобы исключить null
+                checkLocationEnabled()
+                initOSM()
+            } else {
+                showToast("Вы не дали разрешения на использование местоположения")
+            }
         }
     }
+
     // основная проверка разрешений
     private fun checkLocPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -203,7 +215,7 @@ class MainFragment : Fragment() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                 checkLocationEnabled()
-                    initOSM()
+                initOSM()
             } else {
                 // Объясни пользователю, зачем нужно разрешение на фоновое местоположение, затем запрашивай его
                 showBackgroundLocationPermissionRationale()
@@ -217,9 +229,10 @@ class MainFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun checkPermissionForQ() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) &&
-            checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+            checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        ) {
             checkLocationEnabled()
-                initOSM()
+            initOSM()
 
         } else {
             pLauncher.launch(
@@ -242,10 +255,10 @@ class MainFragment : Fragment() {
         }
     }
 
-    private fun checkLocationEnabled(){
+    private fun checkLocationEnabled() {
         val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        if (!isEnabled){
+        if (!isEnabled) {
             DialogManager.showLocEnableDialog(
                 activity as AppCompatActivity, object : DialogManager.Listener {
                     override fun onClick() {
@@ -254,7 +267,8 @@ class MainFragment : Fragment() {
                 }
             )
         } else {
-            showToast("Location enabled") }
+            showToast("Location enabled")
+        }
     }
 
     // Показываем диалог или уведомление с объяснением
@@ -266,7 +280,32 @@ class MainFragment : Fragment() {
 
 
 
+    // забираем данные от LocationService
+    private val receiever = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, i: Intent?) {
+            // фильтр ресивера для принятия только нужных данных
+            if (i?.action == LocationService.LOC_MODEL_INTENT) {
+                val locModel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    i.getSerializableExtra(LocationService.LOC_MODEL_INTENT, LocationModel::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    i.getSerializableExtra(LocationService.LOC_MODEL_INTENT) as? LocationModel
+                }
+                locModel?.let {
+                    Log.d("MyLog", "Main Fragment Distance: ${it.distance}")
+                }
+            }
+        }
 
+    }
+
+    // регистрируем ресивер
+    private fun regisetrLocReciever(){
+        // создаем внутри его фильтр
+        val locFilter = IntentFilter(LocationService.LOC_MODEL_INTENT)
+        LocalBroadcastManager.getInstance(activity as AppCompatActivity)
+            .registerReceiver(receiever, locFilter)
+    }
 
     companion object {
         @JvmStatic
@@ -274,57 +313,3 @@ class MainFragment : Fragment() {
     }
 }
 
-/* OLD VERSION
-
-// для разных версий андроид требуется различные разрешения. Для андроид 10 и ранее одно разрешение, а для старше 10 - 2
-private fun checkLocPermission(){
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q){
-        checkPermissonAfter10()
-    } else {
-        checkPermissonBefore10()
-    }
-}
-
-// проверяем разрешения при версии 10 и выше
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun checkPermissonAfter10() {
-        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-            && checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        ) {
-            initOSM() // если есть оба разрешения, то все ОК
-        } else { // если нет, то спрашиваем оба разрешения
-            pLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                )
-            )
-        }
-    }
-
-    // проверяем разрешения до версии 10 и выше
-    private fun checkPermissonBefore10() {
-        if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))
-        {
-            initOSM() // если есть разрешение, то все ОК
-        } else { // если нет, то спрашиваем разрешение
-            pLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            )
-        }
-    }
-
-
-private fun checkLocationEnabled(){
-        val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        if (!isEnabled){
-            showToast("GPS ERR")
-        } else {
-            showToast("GPS OK")
-        }
-    }
-
- */

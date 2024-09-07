@@ -26,10 +26,14 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import androidx.core.app.ActivityCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import org.osmdroid.util.GeoPoint
 
 
 // создаем сервис для работы в трее
 class LocationService : Service() {
+    // переменная для передаччи данных в LocationModel
+    private lateinit var geoPointsList: ArrayList<GeoPoint>
     // переменная, куда запишем дистанцию
     private var distance = 0.0f
     // переменная для хранения пердыдущего значения для опредления дистанции
@@ -39,6 +43,7 @@ class LocationService : Service() {
     // объект, представляющий запрос на обновление местоположения. Включает такие параметры,
     // как интервал обновления и приоритет
     private lateinit var locRequest: LocationRequest
+    
 
     // обязательный метод для всех сервисов, он используется для связывания с компонентами, которые запускают этот сервис.
     override fun onBind(intent: Intent?): IBinder? {
@@ -59,6 +64,8 @@ class LocationService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        // создали пустой массив
+        geoPointsList = ArrayList()
         initLocation()
     }
 
@@ -69,17 +76,34 @@ class LocationService : Service() {
         locProvider.removeLocationUpdates(locCallBack)
     }
 
-    private val locCallBack = object : LocationCallback(){
+    private val locCallBack = object : LocationCallback() {
         override fun onLocationResult(lResult: LocationResult) {
             super.onLocationResult(lResult)
             val currentLocation = lResult.lastLocation
-            if (lastLocation != null && currentLocation != null){
+            if (lastLocation != null && currentLocation != null) {
                 if (currentLocation.speed > 0.2)
                     distance += lastLocation?.distanceTo(currentLocation)!!
+                // добавляем геоточки в список
+                geoPointsList.add(GeoPoint(currentLocation.latitude, currentLocation.longitude))
+                val locModel = LocationModel(
+                    currentLocation.speed,
+                    distance,
+                    geoPointsList
+                )
+                // как только геопоинт >2 отправляем параметры местоположения
+                sendLocData(locModel)
             }
             lastLocation = currentLocation
-            Log.d("MyLog","Distance: $distance")
         }
+    }
+
+    // отправляем данные в mainFragment через интент
+    private fun sendLocData(locModel: LocationModel){
+        // создаем интент и даем ему название
+        val i = Intent(LOC_MODEL_INTENT)
+        // помещаем наш data класс для отправки
+        i.putExtra(LOC_MODEL_INTENT, locModel)
+        LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(i)
     }
 
     // Этот метод отвечает за создание и запуск уведомления, которое будет отображаться в статусной строке, пока сервис активен.
@@ -140,6 +164,7 @@ class LocationService : Service() {
 
 
     companion object {
+        const val LOC_MODEL_INTENT = "loc_intent"
         const val CHANNEL_ID = "channel_1"
         var isRunning = false
         var startTime = 0L

@@ -10,6 +10,7 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +43,7 @@ import java.util.TimerTask
 class MainFragment : Fragment() {
     private lateinit var binding: FragmentMainBinding
 
-    private var trackItem: TrackItem? = null
+    private var locationModel: LocationModel? = null
     // переменная для отображения первого старта
     private var firstStart: Boolean = true
     // переменная для полилинии
@@ -104,14 +105,7 @@ class MainFragment : Fragment() {
             tvDistance.text = distance
             tvSpeed.text = velocity
             tvAverageSpeed.text = averageVelocity
-            trackItem = TrackItem(
-                null,
-                getCurrentTime(),
-                TimeUtils.getDate(),
-                String.format("%.1f", it.distance),
-                getAverageSpeed(it.distance),
-                ""
-            )
+            locationModel = it
             updatePolyline(it.geoPointsList)
         }
     }
@@ -129,6 +123,15 @@ class MainFragment : Fragment() {
             tvAverageSpeed.text = Avelosity
         }
     }
+
+    trackItem = TrackItem(
+                null,
+                getCurrentTime(),
+                TimeUtils.getDate(),
+                String.format("%.1f", it.distance),
+                getAverageSpeed(it.distance),
+                geopointsToString(it.geoPointsList)
+            )
      */
 
 
@@ -167,6 +170,16 @@ class MainFragment : Fragment() {
         return "${getString(R.string.timer)}: ${TimeUtils.getTime(System.currentTimeMillis() - startTime)}"
     }
 
+    private fun geopointsToString(list: List<GeoPoint>): String{
+        // 45.898998, -8.727272/45.892398, -8.7274572
+        val sb = StringBuilder() // создаем стринг билдер
+        list.forEach{
+            sb.append("${it.latitude}, ${it.longitude}/")
+        }
+        Log.d("MyLog","Points: $sb")
+        return sb.toString()
+    }
+
 
     private fun startStopService() {
         // если сервис не запущен, то запускаем функцию
@@ -178,7 +191,7 @@ class MainFragment : Fragment() {
             timer?.cancel()
             // сохранение маршрута
             DialogManager.showSaveDialog(requireContext(),
-                trackItem,
+                getTrackItem(),
                 object : DialogManager.Listener{
                 override fun onClick() {
                     showToast("Saved")
@@ -187,6 +200,17 @@ class MainFragment : Fragment() {
         }
         // принемаем обратное значение
         isServiceRunning = !isServiceRunning
+    }
+
+    private fun getTrackItem(): TrackItem{
+        return TrackItem(
+            null,
+            getCurrentTime(),
+            TimeUtils.getDate(),
+            String.format(Locale.US, "%.1f", locationModel?.distance), // locationModel?.distance?.div(1000) ?:0), безопасное деление на ноль
+            getAverageSpeed(locationModel?.distance ?: 0.0f),
+            geopointsToString(locationModel?.geoPointsList ?: listOf())
+        )
     }
 
     // Проверяем состояние сервиса и если он работает,

@@ -83,6 +83,9 @@ class MainFragment : Fragment() {
         updateTime()
         regisetrLocReciever() // регистрируем ресивер
         locationUpdates()
+        model.tracks.observe(viewLifecycleOwner){
+            Log.d("MyLog","List size: ${it.size}")
+        }
     }
 
     private fun setOnClicks() = with(binding) {
@@ -192,12 +195,14 @@ class MainFragment : Fragment() {
             activity?.stopService(Intent(activity, LocationService::class.java))
             binding.fStartStop.setImageResource(R.drawable.ic_play)
             timer?.cancel()
+            val track = getTrackItem()
             // сохранение маршрута
             DialogManager.showSaveDialog(requireContext(),
-                getTrackItem(),
+                track,
                 object : DialogManager.Listener{
                 override fun onClick() {
-                    showToast("Saved")
+                    showToast("Track Saved")
+                    model.insertTrack(track)
                 }
             })
         }

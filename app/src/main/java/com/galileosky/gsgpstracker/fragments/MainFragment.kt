@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.galileosky.gsgpstracker.MainApp
 import com.galileosky.gsgpstracker.MainViewModel
 import com.galileosky.gsgpstracker.R
 import com.galileosky.gsgpstracker.databinding.FragmentMainBinding
@@ -49,7 +50,9 @@ class MainFragment : Fragment() {
     // переменная для полилинии
     private var pl: Polyline? = null
     // инициализируем ViewModel класс
-    private val model: MainViewModel by activityViewModels()
+    private val model: MainViewModel by activityViewModels{
+        MainViewModel.viewModelFactory((requireContext().applicationContext as MainApp).database)
+    }
 
     // переменная для проверки работы сервиса
     private var isServiceRunning = false

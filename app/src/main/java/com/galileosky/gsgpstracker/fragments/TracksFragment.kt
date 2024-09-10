@@ -5,10 +5,19 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.galileosky.gsgpstracker.MainApp
+import com.galileosky.gsgpstracker.MainViewModel
 import com.galileosky.gsgpstracker.databinding.TracksBinding
+import com.galileosky.gsgpstracker.db.TrackAdapter
 
 class TracksFragment : Fragment() {
     private lateinit var binding: TracksBinding
+    private lateinit var adapter: TrackAdapter
+    private val model: MainViewModel by activityViewModels{
+        MainViewModel.viewModelFactory((requireContext().applicationContext as MainApp).database)
+    }
 
 
     override fun onCreateView(
@@ -18,6 +27,29 @@ class TracksFragment : Fragment() {
         binding = TracksBinding.inflate(inflater, container, false)
         return binding.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initRcView()
+        getTracks()
+    }
+
+    private fun getTracks(){
+        model.tracks.observe(viewLifecycleOwner){
+            adapter.submitList(it)
+            // проверка чтобы убрать слово пусто на вкладке tracks
+            binding.tvEmpty.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
+    // функции для работы с разметкой
+    private fun initRcView() = with(binding){
+        adapter = TrackAdapter()
+        rcView.layoutManager = LinearLayoutManager(requireContext())
+        rcView.adapter = adapter
+    }
+
+
 
     companion object {
         @JvmStatic

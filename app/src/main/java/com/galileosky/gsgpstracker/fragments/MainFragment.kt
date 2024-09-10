@@ -83,10 +83,15 @@ class MainFragment : Fragment() {
         updateTime()
         regisetrLocReciever() // регистрируем ресивер
         locationUpdates()
-        model.tracks.observe(viewLifecycleOwner){
+
+    }
+
+    /* для проверки делал
+
+    model.tracks.observe(viewLifecycleOwner){
             Log.d("MyLog","List size: ${it.size}")
         }
-    }
+     */
 
     private fun setOnClicks() = with(binding) {
         val listener = onClicks()

@@ -20,6 +20,10 @@ class MainViewModel(db: MainDb): ViewModel() {
     fun insertTrack(trackItem: TrackItem) = viewModelScope.launch {
         dao.insertTrack(trackItem)
     }
+    // функция удаления треков
+    fun deleteTrack(trackItem: TrackItem) = viewModelScope.launch {
+        dao.deleteTrack(trackItem)
+    }
 
     class viewModelFactory(private val db: MainDb) : ViewModelProvider.Factory{
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

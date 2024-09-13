@@ -16,6 +16,7 @@ class TrackAdapter(private val listener: Listener) : ListAdapter<TrackItem, Trac
         private var trackTemp: TrackItem? = null // контейнер для хранения полученных значений из функции bind
         init {
             binding.ibDelete.setOnClickListener(this)
+            binding.item.setOnClickListener(this)
         }
         fun bind(track: TrackItem) = with(binding) {
             trackTemp = track
@@ -29,9 +30,16 @@ class TrackAdapter(private val listener: Listener) : ListAdapter<TrackItem, Trac
             tvTimes.text = time
             tvDistance.text = distance
         }
-        // ко всему холдеру добавляем функцию нажатия
-        override fun onClick(v: View?) {
-            trackTemp?.let { listener.onClick(it) } // если trackTemp != null только тогда запуститься let
+        // ко всему холдеру добавляем функцию слушатель нажатий
+        override fun onClick(view: View) {
+            val type = when(view.id){
+                // оставлю старый код trackTemp?.let { listener.onClick(it, ClickType.DELETE) } // если trackTemp != null только тогда запуститься let
+                R.id.ibDelete -> ClickType.DELETE
+                R.id.item -> ClickType.OPEN
+                else -> ClickType.OPEN
+            }
+            trackTemp?.let { listener.onClick(it, type) }
+
         }
     }
     // специальный класс компоратор, который будет следить за объектами и не давать собирать весь список по новой
@@ -58,7 +66,12 @@ class TrackAdapter(private val listener: Listener) : ListAdapter<TrackItem, Trac
 
     // мост между адаптером и фрагментом
     interface Listener {
-        fun onClick(track: TrackItem)
+        fun onClick(track: TrackItem, type: ClickType)
+    }
+    // для просмотра трека
+    enum class ClickType{
+        DELETE,
+        OPEN
     }
 
 }

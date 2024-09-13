@@ -12,6 +12,7 @@ import com.galileosky.gsgpstracker.MainViewModel
 import com.galileosky.gsgpstracker.databinding.TracksBinding
 import com.galileosky.gsgpstracker.db.TrackAdapter
 import com.galileosky.gsgpstracker.db.TrackItem
+import com.galileosky.gsgpstracker.utils.openFragment
 
 class TracksFragment : Fragment(), TrackAdapter.Listener{
     private lateinit var binding: TracksBinding
@@ -58,8 +59,13 @@ class TracksFragment : Fragment(), TrackAdapter.Listener{
     }
 
     // фунция удаления элементов
-    override fun onClick(track: TrackItem) {
-        // для теста оставлю Log.d("MyLog", "Delete track ${track.id}")
-        model.deleteTrack(track)
+    override fun onClick(track: TrackItem, type: TrackAdapter.ClickType) {
+        when(type){
+            TrackAdapter.ClickType.DELETE -> model.deleteTrack(track)
+            TrackAdapter.ClickType.OPEN -> openFragment(ViewTrackFragment.newInstance())
+        }
+        //Log.d("MyLog", "Type: $type")
+    // для теста оставлю Log.d("MyLog", "Delete track ${track.id}")
+        //model.deleteTrack(track)
     }
 }

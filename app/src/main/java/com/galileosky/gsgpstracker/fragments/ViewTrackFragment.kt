@@ -1,12 +1,16 @@
 package com.galileosky.gsgpstracker.fragments
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.fragment.app.activityViewModels
+import androidx.preference.Preference
+import androidx.preference.PreferenceManager
 import com.galileosky.gsgpstracker.MainApp
 import com.galileosky.gsgpstracker.MainViewModel
 import com.galileosky.gsgpstracker.R
@@ -14,6 +18,7 @@ import com.galileosky.gsgpstracker.databinding.ViewTrackBinding
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 
 class ViewTrackFragment : Fragment() {
@@ -52,6 +57,7 @@ class ViewTrackFragment : Fragment() {
             // перерабатываем точки + парсинг
             val polyline = getPolyline(it.geoPoints)
             map.overlays.add(polyline)
+            setMarkers(polyline.actualPoints)
             goToStartPosition(polyline.actualPoints[0])
         }
     }
@@ -61,10 +67,33 @@ class ViewTrackFragment : Fragment() {
         binding.map.controller.animateTo(startPosition)
     }
 
+    // маркеры для обзначения начальной и конечной позиции трека
+    private fun setMarkers(list: List<GeoPoint>) = with(binding){
+        val startMarker = Marker(map)
+        val finishMarker = Marker(map)
+        // Настраиваем маркеры
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        finishMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        // Добавляем иконки старта и конца трека
+        startMarker.icon = getDrawable(requireContext(), R.drawable.ic_start_location_24)
+        finishMarker.icon = getDrawable(requireContext(), R.drawable.ic_location_off_24)
+        startMarker.position = list[0]
+        finishMarker.position = list[list.size - 1]
+        // накладываем как слой на карту
+        map.overlays.add(startMarker)
+        map.overlays.add(finishMarker)
+
+    }
+
     // функция для получения полилинн для постройки трека
     private fun getPolyline(geopoints: String): Polyline{
         // создаем список геоточек
         var polyline = Polyline()
+        // меняем цвет трека в зависимости от настроек - track_color_key
+        polyline.outlinePaint.color = Color.parseColor(
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getString("track_color_key", "#FF3E33BF")
+        )
         val list = geopoints.split("/")
         list.forEach{
             // исключаю ошибку none последнего элемента после конечного слэша

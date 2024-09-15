@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceManager
 import com.galileosky.gsgpstracker.MainApp
 import com.galileosky.gsgpstracker.MainViewModel
 import com.galileosky.gsgpstracker.R
@@ -265,7 +266,10 @@ class MainFragment : Fragment() {
 
     private fun initOSM() = with(binding) {
         pl = Polyline() // инициализируем полилинию
-        pl?.outlinePaint?.color = Color.BLUE
+        pl?.outlinePaint?.color = Color.parseColor(
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .getString("track_color_key", "#FF3E33BF")
+        )
         map.controller.setZoom(18.0)
         // Создается экземпляр класса GpsMyLocationProvider, который используется для получения данных о местоположении устройства с помощью GPS.
         // Этот провайдер будет передавать данные о местоположении для использования на карте.

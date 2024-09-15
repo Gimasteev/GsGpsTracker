@@ -42,4 +42,5 @@
 
     <!--    для вкладки трек-->
     <string name="track_empty">Empty</string>
+    <string name="date">Date</string>
 </resources>

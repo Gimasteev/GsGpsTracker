@@ -62,7 +62,13 @@ class TracksFragment : Fragment(), TrackAdapter.Listener{
     override fun onClick(track: TrackItem, type: TrackAdapter.ClickType) {
         when(type){
             TrackAdapter.ClickType.DELETE -> model.deleteTrack(track)
-            TrackAdapter.ClickType.OPEN -> openFragment(ViewTrackFragment.newInstance())
+            TrackAdapter.ClickType.OPEN -> {
+                // для отображения сохраненного трека
+                // передаем трек
+                model.currentTrack.value = track
+                openFragment(ViewTrackFragment.newInstance())
+            }
+
         }
         //Log.d("MyLog", "Type: $type")
     // для теста оставлю Log.d("MyLog", "Delete track ${track.id}")

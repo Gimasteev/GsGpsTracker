@@ -34,7 +34,7 @@ object DialogManager{
         val dialog = builder.create()
         binding.apply {
             val time = item?.time
-            val speed = "${item?.velocity} km/h"
+            val speed = "${item?.speed} km/h"
             val distance = "${item?.distance} m"
             tvTime.text = time
             tvVelocity.text = speed

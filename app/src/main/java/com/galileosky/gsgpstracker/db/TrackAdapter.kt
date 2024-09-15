@@ -21,7 +21,7 @@ class TrackAdapter(private val listener: Listener) : ListAdapter<TrackItem, Trac
         fun bind(track: TrackItem) = with(binding) {
             trackTemp = track
             val speed = "${itemView.context.getString(R.string.map_a_speed)} " +
-                    "${track.velocity} " +
+                    "${track.speed} " +
                     itemView.context.getString(R.string.map_kmh)
             val time = track.time
             val distance = "${track.distance} ${itemView.context.getString(R.string.map_meters)}"

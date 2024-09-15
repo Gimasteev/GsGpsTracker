@@ -52,7 +52,7 @@
         android:background="#9929B7EA"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:text="Time: 00:00:00"
+        android:text="@string/default_timer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -64,7 +64,7 @@
         android:background="#9929B7EA"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:text="Average speed: 10 km/h"
+        android:text="@string/default_average_speed"
         app:layout_constraintStart_toStartOf="@+id/tvTime"
         app:layout_constraintTop_toBottomOf="@+id/tvTime" />
 
@@ -76,7 +76,7 @@
         android:background="#9929B7EA"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:text="Speed: 3.5 km/h"
+        android:text="@string/default_speed"
         app:layout_constraintStart_toStartOf="@+id/tvAverageSpeed"
         app:layout_constraintTop_toBottomOf="@+id/tvAverageSpeed" />
 
@@ -88,7 +88,7 @@
         android:background="#9929B7EA"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:text="Distance: 1500 m"
+        android:text="@string/default_distance"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@+id/tvSpeed"
         app:layout_constraintTop_toBottomOf="@+id/tvSpeed" />

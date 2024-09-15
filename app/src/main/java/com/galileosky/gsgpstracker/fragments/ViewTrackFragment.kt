@@ -3,13 +3,12 @@ package com.galileosky.gsgpstracker.fragments
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import com.galileosky.gsgpstracker.MainApp
 import com.galileosky.gsgpstracker.MainViewModel
@@ -22,8 +21,9 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 
 class ViewTrackFragment : Fragment() {
+    private var startPoint: GeoPoint? = null
     private lateinit var binding: ViewTrackBinding
-    private val model: MainViewModel by activityViewModels{
+    private val model: MainViewModel by activityViewModels {
         MainViewModel.viewModelFactory((requireContext().applicationContext as MainApp).database)
     }
 
@@ -40,6 +40,10 @@ class ViewTrackFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         // запустим ловлю трека)
         getTrack()
+        // функция для центрирования экрана на начале трека
+        binding.fCentr.setOnClickListener{
+            if (startPoint != null)binding.map.controller.animateTo(startPoint)
+        }
     }
 
     private fun getTrack() = with(binding){
@@ -59,6 +63,7 @@ class ViewTrackFragment : Fragment() {
             map.overlays.add(polyline)
             setMarkers(polyline.actualPoints)
             goToStartPosition(polyline.actualPoints[0])
+            startPoint = polyline.actualPoints[0]
         }
     }
 
@@ -88,7 +93,7 @@ class ViewTrackFragment : Fragment() {
     // функция для получения полилинн для постройки трека
     private fun getPolyline(geopoints: String): Polyline{
         // создаем список геоточек
-        var polyline = Polyline()
+        val polyline = Polyline()
         // меняем цвет трека в зависимости от настроек - track_color_key
         polyline.outlinePaint.color = Color.parseColor(
             PreferenceManager.getDefaultSharedPreferences(requireContext())

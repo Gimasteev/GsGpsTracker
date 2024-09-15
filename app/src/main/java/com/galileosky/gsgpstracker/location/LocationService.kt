@@ -27,6 +27,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.preference.PreferenceManager
 import org.osmdroid.util.GeoPoint
 
 
@@ -43,6 +44,9 @@ class LocationService : Service() {
     // объект, представляющий запрос на обновление местоположения. Включает такие параметры,
     // как интервал обновления и приоритет
     private lateinit var locRequest: LocationRequest
+    // булеан переменная для скорости - тест эмулятора
+    // поставь true если тестишь при скорости 0 km/h (на эмуляторе)
+    private var isDebug = false
     
 
     // обязательный метод для всех сервисов, он используется для связывания с компонентами, которые запускают этот сервис.
@@ -79,12 +83,17 @@ class LocationService : Service() {
     private val locCallBack = object : LocationCallback() {
         override fun onLocationResult(lResult: LocationResult) {
             super.onLocationResult(lResult)
+            // получаем текущую позицию
             val currentLocation = lResult.lastLocation
+            // проверям что получили местоположение
             if (lastLocation != null && currentLocation != null) {
-                if (currentLocation.speed > 0.2)
+                // проверям скорость чтобы не добавлять левые метры при остановке
+                if (currentLocation.speed > 0.4 || isDebug) {
+                    // добавляем к дистанции расстояние
                     distance += lastLocation?.distanceTo(currentLocation)!!
-                // добавляем геоточки в список
-                geoPointsList.add(GeoPoint(currentLocation.latitude, currentLocation.longitude))
+                    // добавляем геоточки в список
+                    geoPointsList.add(GeoPoint(currentLocation.latitude, currentLocation.longitude))
+                }
                 val locModel = LocationModel(
                     currentLocation.speed,
                     distance,
@@ -140,12 +149,17 @@ class LocationService : Service() {
     }
 
     private fun initLocation(){
+        // подключчаем интервалы из настроек
+        val updateInterval = PreferenceManager.getDefaultSharedPreferences(
+            this
+        ).getString("update_time_key", "3000")?.toLong() ?: 3000 // забираем то что под ключем. По умолчанию 3 сек
         locRequest = LocationRequest.create()
         // интервал передачи сообщений
-        locRequest.interval = 5000 // примерное ограничение
-        locRequest.fastestInterval = 5000 // жесткое ограничение в 5 сек
+        locRequest.interval = updateInterval // примерное ограничение
+        locRequest.fastestInterval = updateInterval // жесткое ограничение в 5 сек
         locRequest.priority = PRIORITY_HIGH_ACCURACY
         locProvider = LocationServices.getFusedLocationProviderClient(baseContext)
+        Log.d("MyLog", "Interval = $updateInterval")
     }
 
     private fun startLocationUpdates() {

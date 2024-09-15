@@ -24,7 +24,7 @@
         android:background="#9929B7EA"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:text="Data 15/09/2024 09:00"
+        android:text="@string/default_data"
         app:layout_constraintStart_toStartOf="@+id/tvTime"
         app:layout_constraintTop_toTopOf="@+id/map" />
 
@@ -37,7 +37,7 @@
         android:background="#9929B7EA"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:text="Time: 00:00:00"
+        android:text="@string/default_timer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvData" />
 
@@ -49,7 +49,7 @@
         android:background="#9929B7EA"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:text="Average speed: 10 km/h"
+        android:text="@string/default_average_speed"
         app:layout_constraintStart_toStartOf="@+id/tvTime"
         app:layout_constraintTop_toBottomOf="@+id/tvTime" />
 
@@ -61,10 +61,24 @@
         android:background="#9929B7EA"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:text="Distance: 1500 m"
+        android:text="@string/default_distance"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@+id/tvData"
         app:layout_constraintTop_toBottomOf="@+id/tvAverageSpeed" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fCentr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:clickable="true"
+        android:contentDescription="@string/location"
+        android:focusable="true"
+        android:src="@drawable/ic_location"
+        app:backgroundTint="@color/light_blue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

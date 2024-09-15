@@ -64,6 +64,9 @@ class MainFragment : Fragment() {
     // переменная для хранения времени старта маршрута
     private var startTime = 0L
 
+    // переменная для перехода на точку
+    private lateinit var myLocOverLay: MyLocationNewOverlay
+
     // переменная для разршений, работающая с массивом строк
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
 
@@ -97,16 +100,25 @@ class MainFragment : Fragment() {
     private fun setOnClicks() = with(binding) {
         val listener = onClicks()
         fStartStop.setOnClickListener(listener)
+        floatingActionButton.setOnClickListener(listener)
     }
 
-    // Слушатель нажатий для любой кнопки в mainfragment
     // Слушатель нажатий для любой кнопки в mainfragment
     private fun onClicks(): View.OnClickListener {
         return View.OnClickListener {
             when (it.id) {
                 R.id.fStartStop -> startStopService()
+                R.id.floatingActionButton -> centerLocation()
             }
         }
+    }
+
+    // центруем локацию
+    private fun centerLocation(){
+        binding.map.controller.animateTo(myLocOverLay.myLocation)
+        // возваращаем функцию слеженеия за местоположением при возврате к текущей точке
+        myLocOverLay.enableFollowLocation()
+
     }
 
     private fun locationUpdates() = with(binding) {
@@ -254,6 +266,8 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         checkLocPermission()
+        // для того, чтобы при выхода на home отрисовать трек
+        firstStart = true
     }
 
     private fun settingsOsm() {
@@ -276,15 +290,18 @@ class MainFragment : Fragment() {
         val mLocProvider = GpsMyLocationProvider(requireContext())
         /// Создается объект MyLocationNewOverlay, который отвечает за отображение текущего местоположения пользователя на карте.
         // Он использует mLocProvider для получения данных о местоположении и связывается с картой map.
-        val myLocOverLay = MyLocationNewOverlay(mLocProvider, map)
+        myLocOverLay = MyLocationNewOverlay(mLocProvider, map)
         // Эта строка активирует отображение текущего местоположения пользователя на карте.
         // Если GPS или другие источники местоположения включены и предоставляют данные, на карте будет отображаться маркер, указывающий текущее положение пользователя.
         myLocOverLay.enableMyLocation()
         myLocOverLay.enableFollowLocation()
         myLocOverLay.runOnFirstFix {
             map.overlays.clear()
+            // добавили слой полилинии
+            map.overlays.add(pl)
+            // местоположение под полилинией для красоты
             map.overlays.add(myLocOverLay)
-            map.overlays.add(pl) // добавили слой полилинии
+
         }
         //map.controller.animateTo(GeoPoint(58.00171, 56.295304))
         //58.00171° 56.295304°
@@ -431,7 +448,8 @@ class MainFragment : Fragment() {
 
     // функция добавления точек polyline
     private fun addPoint(list: List<GeoPoint>){
-        pl?.addPoint(list[list.size - 1]) // добавляем последнюю точку
+        // если список не пустой, то запускаем код
+        if (list.isNotEmpty())pl?.addPoint(list[list.size - 1]) // добавляем последнюю точку
     }
 
     // функция заполнения точек polyline должна запуститься
@@ -445,6 +463,7 @@ class MainFragment : Fragment() {
     // тут уду решать что делать - или восстанавливать историю полилини
     // или сразу строить на карте
     private fun updatePolyline(list: List<GeoPoint>){
+
         if (list.size > 1 && firstStart){
         // тогда выгружаем точки
             fillPolyLine(list)

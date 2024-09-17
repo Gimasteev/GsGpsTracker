@@ -10,6 +10,7 @@
             android:entryValues="@array/loc_time_update_value"
             android:key="update_time_key"
             android:title="@string/update_time"
+            android:fontFamily="@font/graphik_semibold_cy"
             app:icon="@drawable/ic_baseline_timelapse_24"
             app:iconSpaceReserved="true"
             app:summary="@string/update_time_summary" />
@@ -19,6 +20,7 @@
             android:entryValues="@array/track_color_value"
             android:key="track_color_key"
             android:title="@string/track_color"
+            android:fontFamily="@font/graphik_semibold_cy"
             app:icon="@drawable/ic_choose_color"
             app:iconSpaceReserved="true"
             app:summary="@string/track_color_summary" />

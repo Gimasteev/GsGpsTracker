@@ -3,6 +3,7 @@ package com.galileosky.gsgpstracker.fragments
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,26 +47,32 @@ class ViewTrackFragment : Fragment() {
         }
     }
 
-    private fun getTrack() = with(binding){
-        // ловим трек
-        model.currentTrack.observe(viewLifecycleOwner){
-            // заполняем текстовую часть
+    private fun getTrack() = with(binding) {
+        model.currentTrack.observe(viewLifecycleOwner) {
+            // Заполняем текстовую часть
             val date = "${getString(R.string.date)} ${it.date}"
-            val avergeSpeed = "${getString(R.string.map_a_speed)} ${it.speed} ${getString(R.string.map_kmh)}"
+            val averageSpeed = "${getString(R.string.map_a_speed)} ${it.speed} ${getString(R.string.map_kmh)}"
             val distance = "${getString(R.string.save_distance)} ${it.distance} ${getString(R.string.map_meters)}"
             tvData.text = date
             tvTime.text = it.time
-            tvAverageSpeed.text = avergeSpeed
+            tvAverageSpeed.text = averageSpeed
             tvDistance.text = distance
-            // добавляем полилинию
-            // перерабатываем точки + парсинг
+            // Добавляем полилинию
             val polyline = getPolyline(it.geoPoints)
             map.overlays.add(polyline)
-            setMarkers(polyline.actualPoints)
-            goToStartPosition(polyline.actualPoints[0])
-            startPoint = polyline.actualPoints[0]
+
+            // Проверяем, что список не пуст и содержит хотя бы один элемент
+            if (polyline.actualPoints.isNotEmpty()) {
+                setMarkers(polyline.actualPoints)
+                goToStartPosition(polyline.actualPoints[0])
+                startPoint = polyline.actualPoints[0]
+            } else {
+                // Логирование или обработка ситуации, когда список пуст
+                Log.e("ViewTrackFragment", "Точки трека отсутствуют!")
+            }
         }
     }
+
 
     private fun goToStartPosition(startPosition: GeoPoint){
         binding.map.controller.zoomTo(16.0)
@@ -73,7 +80,8 @@ class ViewTrackFragment : Fragment() {
     }
 
     // маркеры для обзначения начальной и конечной позиции трека
-    private fun setMarkers(list: List<GeoPoint>) = with(binding){
+    private fun setMarkers(list: List<GeoPoint>):Unit = with(binding){
+        if (list.isEmpty()) return // Если список пуст, выход из функции
         val startMarker = Marker(map)
         val finishMarker = Marker(map)
         // Настраиваем маркеры
@@ -87,7 +95,6 @@ class ViewTrackFragment : Fragment() {
         // накладываем как слой на карту
         map.overlays.add(startMarker)
         map.overlays.add(finishMarker)
-
     }
 
     // функция для получения полилинн для постройки трека

@@ -11,8 +11,8 @@
     <string name="no_permisson_Fine_Location">No permission to obtain a location</string>
 <!--    для цветов-->
     <string name="Pink">Pink</string>
-    <string name="Green">Pink</string>
-    <string name="Blue">Pink</string>
+    <string name="Green">Green</string>
+    <string name="Blue">Blue</string>
 <!--    для диалогового окна-->
     <string name="location_disabled">Location disabled</string>
     <string name="location_dialog_message">Do you want enable GPS?</string>

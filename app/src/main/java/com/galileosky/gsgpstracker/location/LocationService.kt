@@ -137,7 +137,7 @@ class LocationService : Service() {
         )
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher) // Иконка для уведомления
+            .setSmallIcon(R.mipmap.ic_launcher_g) // Иконка для уведомления
             .setContentTitle(getString(R.string.tracker_running)) // Основной текст
             .setContentText(getString(R.string.background_running)) // Описание уведомления
             .setContentIntent(pIntent)
